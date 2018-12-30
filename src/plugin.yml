@@ -1,0 +1,13 @@
+---
+name: TimedPerms
+version: 1.0
+main: de.timmyrs.TimedPerms
+author: timmyRS
+website: https://github.com/timmyrs/TimedPerms
+
+commands:
+  timedperms: {}
+
+permissions:
+  timedperms.reload:
+    default: 'op'
