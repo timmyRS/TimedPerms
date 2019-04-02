@@ -1,6 +1,6 @@
 ---
 name: TimedPerms
-version: 1.0
+version: 1.1
 main: de.timmyrs.TimedPerms
 author: timmyRS
 website: https://github.com/timmyrs/TimedPerms
@@ -10,4 +10,6 @@ commands:
 
 permissions:
   timedperms.reload:
+    default: 'op'
+  timedperms.playerinfo:
     default: 'op'

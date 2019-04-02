@@ -160,6 +160,36 @@ public class TimedPerms extends JavaPlugin implements CommandExecutor, Listener
 			redeterminePlayerPermissions();
 			s.sendMessage("§aReloaded the configuration and player permissions.");
 		}
+		else if(a.length > 1 && a[0].equalsIgnoreCase("playerinfo") && s.hasPermission("timedperms.playerinfo"))
+		{
+			final Player p = this.getServer().getPlayer(a[1]);
+			if(p != null)
+			{
+				final TimedPermsPlayer tp = this.players.get(p);
+				if(tp != null)
+				{
+					try
+					{
+						tp.saveTime();
+						final File playerConfigFile = tp.getConfigFile();
+						final YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(playerConfigFile);
+						s.sendMessage(a[1] + " has played a total of " + Math.round(playerConfig.getLong("t", 0) / 60L) + " minutes.");
+					}
+					catch(IOException e)
+					{
+						e.printStackTrace();
+					}
+				}
+				else
+				{
+					s.sendMessage("§c" + a[1] + " is not accounted for.");
+				}
+			}
+			else
+			{
+				s.sendMessage("§c" + a[1] + " is not currently online.");
+			}
+		}
 		else
 		{
 			s.sendMessage("https://github.com/timmyrs/TimedPerms");
@@ -194,7 +224,7 @@ class TimedPermsPlayer
 		return this;
 	}
 
-	private File getConfigFile()
+	File getConfigFile()
 	{
 		if(!TimedPerms.playerDataDir.exists() && !TimedPerms.playerDataDir.mkdir())
 		{
