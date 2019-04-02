@@ -165,24 +165,27 @@ public class TimedPerms extends JavaPlugin implements CommandExecutor, Listener
 			final Player p = this.getServer().getPlayer(a[1]);
 			if(p != null)
 			{
-				final TimedPermsPlayer tp = this.players.get(p);
-				if(tp != null)
+				synchronized(this.players)
 				{
-					try
+					final TimedPermsPlayer tp = this.players.get(p);
+					if(tp != null)
 					{
-						tp.saveTime();
-						final File playerConfigFile = tp.getConfigFile();
-						final YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(playerConfigFile);
-						s.sendMessage(a[1] + " has played a total of " + Math.round(playerConfig.getLong("t", 0) / 60L) + " minutes.");
+						try
+						{
+							tp.saveTime();
+							final File playerConfigFile = tp.getConfigFile();
+							final YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(playerConfigFile);
+							s.sendMessage(a[1] + " has played a total of " + Math.round(playerConfig.getLong("t", 0) / 60L) + " minutes.");
+						}
+						catch(IOException e)
+						{
+							e.printStackTrace();
+						}
 					}
-					catch(IOException e)
+					else
 					{
-						e.printStackTrace();
+						s.sendMessage("§c" + a[1] + " is not accounted for.");
 					}
-				}
-				else
-				{
-					s.sendMessage("§c" + a[1] + " is not accounted for.");
 				}
 			}
 			else
@@ -245,11 +248,7 @@ class TimedPermsPlayer
 			playerGroup = TimedPerms.groups.get(playerConfig.getString("g", ""));
 			for(Group g : TimedPerms.groups.values())
 			{
-				if(g.minutes < 0)
-				{
-					continue;
-				}
-				if(playerMinutes >= g.minutes)
+				if(playerMinutes >= g.minutes && (applicableGroup == null || applicableGroup.minutes < g.minutes))
 				{
 					applicableGroup = g;
 				}
@@ -270,7 +269,7 @@ class TimedPermsPlayer
 				playerConfig.save(playerConfigFile);
 				if(applicableGroup.message != null)
 				{
-					p.sendMessage(applicableGroup.message.replace("&", "§").replace("§§", "§"));
+					p.sendMessage(applicableGroup.message.replace("&", "§").replace("§§", "&"));
 				}
 			}
 			for(String perm : applicableGroup.getAllPermissions())
